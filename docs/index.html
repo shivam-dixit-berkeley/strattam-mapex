@@ -929,28 +929,96 @@
     };
     const network = new vis.Network(container, data, options);
     // Show label and highlight edges on hover
+// Helper to find all paths between two nodes using DFS
+function findAllPathsDFS(start, end, edgesData) {
+  const adjList = new Map();
+  const edgeMap = {};
+
+  edgesData.forEach(edge => {
+    if (!adjList.has(edge.from)) adjList.set(edge.from, []);
+    adjList.get(edge.from).push({ to: edge.to, id: edge.id });
+    edgeMap[`${edge.from}_${edge.to}`] = edge.id;
+  });
+
+  const paths = [];
+
+  function dfs(current, path, edgePath, visited) {
+    if (current === end) {
+      paths.push({ nodes: [...path], edges: [...edgePath] });
+      return;
+    }
+    const neighbors = adjList.get(current) || [];
+    for (const neighbor of neighbors) {
+      if (!visited.has(neighbor.to)) {
+        visited.add(neighbor.to);
+        path.push(neighbor.to);
+        edgePath.push(neighbor.id);
+        dfs(neighbor.to, path, edgePath, visited);
+        visited.delete(neighbor.to);
+        path.pop();
+        edgePath.pop();
+      }
+    }
+  }
+
+  dfs(start, [start], [], new Set([start]));
+  return paths;
+}
+
+// Define Strattam and Mapex IDs
+const startId = "3832ce69-4cc8-4d57-a7d1-c68de11c276b";
+const endId = "2cf2f0d4-e6b2-48e8-b007-002832d3f3a8";
+
+// Compute all paths on load
+const allPaths = findAllPathsDFS(startId, endId, edges.get());
+
+// Highlight path on hover
 network.on("hoverNode", function (params) {
-  const hoveredNodeId = params.node;
-  nodes.update({ id: hoveredNodeId, font: { size: 14 } });
+  const hoveredNode = params.node;
+
+  const highlightNodes = new Set([startId, endId]);
+  const highlightEdges = new Set();
+
+  allPaths.forEach(path => {
+    if (path.nodes.includes(hoveredNode)) {
+      path.nodes.forEach(n => highlightNodes.add(n));
+      path.edges.forEach(e => highlightEdges.add(e));
+    }
+  });
+
+  nodes.get().forEach(node => {
+    nodes.update({
+      id: node.id,
+      color: highlightNodes.has(node.id) ? undefined : { opacity: 0.1 },
+      font: { size: highlightNodes.has(node.id) ? 14 : 1 }
+    });
+  });
 
   edges.get().forEach(edge => {
-    const isConnected = (edge.from === hoveredNodeId || edge.to === hoveredNodeId);
     edges.update({
       id: edge.id,
-      color: isConnected
-        ? { color: "#FF4136" }  // bright red highlight
-        : { color: "#cccccc" }  // dull everything else
+      color: highlightEdges.has(edge.id)
+        ? { color: "#FF4136" }
+        : { color: "#cccccc", opacity: 0.1 }
     });
   });
 });
 
 // Reset on blur
-network.on("blurNode", function (params) {
-  const blurredNodeId = params.node;
-  nodes.update({ id: blurredNodeId, font: { size: 1 } });
+network.on("blurNode", function () {
+  nodes.get().forEach(node => {
+    nodes.update({
+      id: node.id,
+      color: undefined,
+      font: { size: (node.id === startId || node.id === endId) ? 14 : 1 }
+    });
+  });
 
   edges.get().forEach(edge => {
-    edges.update({ id: edge.id, color: { color: "#848484" } });
+    edges.update({
+      id: edge.id,
+      color: { color: "#848484", opacity: 1 }
+    });
   });
 });
 
