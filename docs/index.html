@@ -9,6 +9,42 @@
       height: 90vh;
       border: 1px solid lightgray;
     }
+
+    #legend {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: white;
+    border: 1px solid #ccc;
+    padding: 10px 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    font-family: sans-serif;
+    font-size: 14px;
+    z-index: 999;
+  }
+  #legend h4 {
+    margin: 0 0 8px;
+    font-size: 15px;
+  }
+  #legend ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  #legend li {
+    margin: 4px 0;
+    display: flex;
+    align-items: center;
+  }
+  #legend li span {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    margin-right: 8px;
+    border-radius: 3px;
+    border: 1px solid #ccc;
+  }
   </style>
 </head>
 <body>
@@ -1073,5 +1109,18 @@ network.on("blurNode", function () {
 });
 
 </script>
+  <div id="legend">
+  <h4>Legend</h4>
+  <ul>
+    <li><span style="background:#0074D9;"></span> Strattam Capital</li>
+    <li><span style="background:#FF4136;"></span> Mapex</li>
+    <li><span style="background:#39CCCC;"></span> Investors</li>
+    <li><span style="background:#FFDC00;"></span> Company</li>
+    <li><span style="background:#FF851B;"></span> People</li>
+    <li><span style="background:#2ECC40;"></span> Advisors</li>
+    <li><span style="background:#A78BFA;"></span> Other</li>
+  </ul>
+</div>
+
 </body>
 </html>
