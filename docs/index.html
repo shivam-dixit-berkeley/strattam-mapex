@@ -908,8 +908,18 @@
         hover: true
       },
       physics: {
-        stabilization: true
-      }
+    solver: "repulsion",
+    repulsion: {
+      nodeDistance: 200,     // default is 100
+      centralGravity: 0.1,
+      springLength: 200,
+      springConstant: 0.01,
+      damping: 0.09
+    },
+    stabilization: {
+      iterations: 100
+    }
+  }
     };
     const network = new vis.Network(container, data, options);
   </script>
