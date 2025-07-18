@@ -28,7 +28,8 @@
     "fixed": { x: true, y: true },
     "physics": false,
     "color": "#007BFF",
-    "size": 40
+    "size": 40,
+    "font": { size: 16 }
   },
   {
     "id": "2cf2f0d4-e6b2-48e8-b007-002832d3f3a8",
@@ -40,7 +41,8 @@
     "fixed": { x: true, y: true },
     "physics": false,
     "color": "#FF4136",
-    "size": 40
+    "size": 40,
+    "font": { size: 16 }
   },
   {
     "id": "8f5929e2-ae22-44a4-a73e-6d034c88539e",
@@ -890,7 +892,7 @@
         shape: 'dot',
         size: 20,
         font: {
-          size: 14,
+          size: 1,
           color: '#000'
         },
         borderWidth: 2
@@ -926,6 +928,32 @@
   }
     };
     const network = new vis.Network(container, data, options);
+    // Show label and highlight edges on hover
+network.on("hoverNode", function (params) {
+  const hoveredNodeId = params.node;
+  nodes.update({ id: hoveredNodeId, font: { size: 14 } });
+
+  edges.get().forEach(edge => {
+    const isConnected = (edge.from === hoveredNodeId || edge.to === hoveredNodeId);
+    edges.update({
+      id: edge.id,
+      color: isConnected
+        ? { color: "#FF4136" }  // bright red highlight
+        : { color: "#cccccc" }  // dull everything else
+    });
+  });
+});
+
+// Reset on blur
+network.on("blurNode", function (params) {
+  const blurredNodeId = params.node;
+  nodes.update({ id: blurredNodeId, font: { size: 1 } });
+
+  edges.get().forEach(edge => {
+    edges.update({ id: edge.id, color: { color: "#848484" } });
+  });
+});
+
   </script>
 </body>
 </html>
