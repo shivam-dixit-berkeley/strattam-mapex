@@ -989,10 +989,12 @@ network.on("hoverNode", function (params) {
   nodes.get().forEach(node => {
     nodes.update({
       id: node.id,
-      color: highlightNodes.has(node.id) ? undefined : { opacity: 0.1 },
+      color: highlightNodes.has(node.id)
+        ? undefined
+        : { background: '#e0e0e0', border: '#c0c0c0', opacity: 0.2 },
       font: {
-        size: highlightNodes.has(node.id) ? 14 : 1,
-        color: highlightNodes.has(node.id) ? '#000' : '#ccc'
+        size: highlightNodes.has(node.id) ? 14 : 8,
+        color: highlightNodes.has(node.id) ? '#000' : '#999'
       }
     });
   });
@@ -1003,18 +1005,17 @@ network.on("hoverNode", function (params) {
     edges.update({
       id: edge.id,
       color: isHighlighted
-        ? { color: "#FF4136" }
-        : { color: "#cccccc", opacity: 0.1 },
+        ? { color: "#FF4136", opacity: 1 }
+        : { color: "#cccccc", opacity: 0.2 },
       font: {
-        size: isHighlighted ? 12 : 0,
-        color: isHighlighted ? "#000" : "#ccc"
+        size: isHighlighted ? 12 : 8,
+        color: isHighlighted ? "#000" : "#999"
       }
     });
   });
 });
 
 network.on("blurNode", function () {
-  // Reset nodes
   nodes.get().forEach(node => {
     nodes.update({
       id: node.id,
@@ -1026,7 +1027,6 @@ network.on("blurNode", function () {
     });
   });
 
-  // Reset edges
   edges.get().forEach(edge => {
     edges.update({
       id: edge.id,
