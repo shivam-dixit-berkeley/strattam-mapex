@@ -972,7 +972,6 @@ const endId = "2cf2f0d4-e6b2-48e8-b007-002832d3f3a8";
 // Compute all paths on load
 const allPaths = findAllPathsDFS(startId, endId, edges.get());
 
-// Highlight path on hover
 network.on("hoverNode", function (params) {
   const hoveredNode = params.node;
 
@@ -986,38 +985,56 @@ network.on("hoverNode", function (params) {
     }
   });
 
+  // Update nodes
   nodes.get().forEach(node => {
     nodes.update({
       id: node.id,
       color: highlightNodes.has(node.id) ? undefined : { opacity: 0.1 },
-      font: { size: highlightNodes.has(node.id) ? 14 : 1 }
+      font: {
+        size: highlightNodes.has(node.id) ? 14 : 1,
+        color: highlightNodes.has(node.id) ? '#000' : '#ccc'
+      }
     });
   });
 
+  // Update edges
   edges.get().forEach(edge => {
+    const isHighlighted = highlightEdges.has(edge.id);
     edges.update({
       id: edge.id,
-      color: highlightEdges.has(edge.id)
+      color: isHighlighted
         ? { color: "#FF4136" }
-        : { color: "#cccccc", opacity: 0.1 }
+        : { color: "#cccccc", opacity: 0.1 },
+      font: {
+        size: isHighlighted ? 12 : 0,
+        color: isHighlighted ? "#000" : "#ccc"
+      }
     });
   });
 });
 
-// Reset on blur
 network.on("blurNode", function () {
+  // Reset nodes
   nodes.get().forEach(node => {
     nodes.update({
       id: node.id,
       color: undefined,
-      font: { size: (node.id === startId || node.id === endId) ? 14 : 1 }
+      font: {
+        size: (node.id === startId || node.id === endId) ? 14 : 1,
+        color: '#000'
+      }
     });
   });
 
+  // Reset edges
   edges.get().forEach(edge => {
     edges.update({
       id: edge.id,
-      color: { color: "#848484", opacity: 1 }
+      color: { color: "#848484", opacity: 1 },
+      font: {
+        size: 0,
+        color: '#000'
+      }
     });
   });
 });
