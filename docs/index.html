@@ -29,7 +29,7 @@
     "physics": false,
     "color": "#007BFF",
     "size": 40,
-    "font": { size: 16 }
+    "font": { size: 20 }
   },
   {
     "id": "2cf2f0d4-e6b2-48e8-b007-002832d3f3a8",
@@ -42,7 +42,7 @@
     "physics": false,
     "color": "#FF4136",
     "size": 40,
-    "font": { size: 16 }
+    "font": { size: 20 }
   },
   {
     "id": "8f5929e2-ae22-44a4-a73e-6d034c88539e",
@@ -928,6 +928,40 @@
   }
     };
     const network = new vis.Network(container, data, options);
+    const groupColors = {
+  "investor": "#39CCCC",  // Teal
+  "company": "#FF4136",   // Red (Mapex)
+  "person": "#FF851B",    // Orange
+  "advisor": "#2ECC40",   // Green
+  "other": "#B10DC9"      // Magenta fallback
+};
+
+// Set specific overrides for Strattam and Mapex
+const strattamId = "3832ce69-4cc8-4d57-a7d1-c68de11c276b";
+const mapexId = "2cf2f0d4-e6b2-48e8-b007-002832d3f3a8";
+
+nodes.get().forEach(node => {
+  let baseColor = groupColors[node.group] || groupColors["other"];
+  if (node.id === strattamId) baseColor = "#0074D9"; // Strattam Blue
+  if (node.id === mapexId) baseColor = "#FF4136";   // Mapex Red
+
+  nodes.update({
+    id: node.id,
+    color: {
+      background: baseColor,
+      border: '#333333',
+      highlight: {
+        background: baseColor,
+        border: '#111111'
+      },
+      hover: {
+        background: baseColor,
+        border: '#000000'
+      }
+    }
+  });
+});
+
     // Show label and highlight edges on hover
 // Helper to find all paths between two nodes using DFS
 function findAllPathsDFS(start, end, edgesData) {
