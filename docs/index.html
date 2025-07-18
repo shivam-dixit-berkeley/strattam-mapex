@@ -929,41 +929,36 @@
     };
     const network = new vis.Network(container, data, options);
     const groupColors = {
-  "investor": "#39CCCC",  // Teal
-  "company": "#FF4136",   // Red (Mapex)
-  "person": "#FF851B",    // Orange
-  "advisor": "#2ECC40",   // Green
-  "other": "#B10DC9"      // Magenta fallback
+  "investor": "#39CCCC",   // Teal
+  "company": "#FFDC00",    // Yellow
+  "person": "#FF851B",     // Orange
+  "advisor": "#2ECC40",    // Green
+  "other": "#A78BFA"       // Mauve fallback
 };
 
-// Set specific overrides for Strattam and Mapex
 const strattamId = "3832ce69-4cc8-4d57-a7d1-c68de11c276b";
 const mapexId = "2cf2f0d4-e6b2-48e8-b007-002832d3f3a8";
 
+// Set node colors and store originalColor
 nodes.get().forEach(node => {
   let baseColor = groupColors[node.group] || groupColors["other"];
   if (node.id === strattamId) baseColor = "#0074D9"; // Strattam Blue
-  if (node.id === mapexId) baseColor = "#FF4136";   // Mapex Red
+  if (node.id === mapexId) baseColor = "#FF4136";    // Mapex Red
+
+  node.originalColor = baseColor;
 
   nodes.update({
     id: node.id,
     color: {
       background: baseColor,
       border: '#333333',
-      highlight: {
-        background: baseColor,
-        border: '#111111'
-      },
-      hover: {
-        background: baseColor,
-        border: '#000000'
-      }
+      highlight: { background: baseColor, border: '#111111' },
+      hover: { background: baseColor, border: '#000000' }
     }
   });
 });
 
-    // Show label and highlight edges on hover
-// Helper to find all paths between two nodes using DFS
+// Helper: Find all paths using DFS
 function findAllPathsDFS(start, end, edgesData) {
   const adjList = new Map();
   const edgeMap = {};
@@ -999,17 +994,13 @@ function findAllPathsDFS(start, end, edgesData) {
   return paths;
 }
 
-// Define Strattam and Mapex IDs
-const startId = "3832ce69-4cc8-4d57-a7d1-c68de11c276b";
-const endId = "2cf2f0d4-e6b2-48e8-b007-002832d3f3a8";
+// Compute all paths once
+const allPaths = findAllPathsDFS(strattamId, mapexId, edges.get());
 
-// Compute all paths on load
-const allPaths = findAllPathsDFS(startId, endId, edges.get());
-
+// Hover logic: highlight connected path, dim others
 network.on("hoverNode", function (params) {
   const hoveredNode = params.node;
-
-  const highlightNodes = new Set([startId, endId]);
+  const highlightNodes = new Set([strattamId, mapexId]);
   const highlightEdges = new Set();
 
   allPaths.forEach(path => {
@@ -1019,28 +1010,30 @@ network.on("hoverNode", function (params) {
     }
   });
 
-  // Update nodes
   nodes.get().forEach(node => {
+    const isHighlighted = highlightNodes.has(node.id);
+    const color = isHighlighted ? node.originalColor : "#e0e0e0";
     nodes.update({
       id: node.id,
-      color: highlightNodes.has(node.id)
-        ? undefined
-        : { background: '#e0e0e0', border: '#c0c0c0', opacity: 0.2 },
+      color: {
+        background: color,
+        border: isHighlighted ? '#333' : '#ccc'
+      },
       font: {
-        size: highlightNodes.has(node.id) ? 14 : 8,
-        color: highlightNodes.has(node.id) ? '#000' : '#999'
+        size: isHighlighted ? 14 : 8,
+        color: isHighlighted ? '#000' : '#999'
       }
     });
   });
 
-  // Update edges
   edges.get().forEach(edge => {
     const isHighlighted = highlightEdges.has(edge.id);
     edges.update({
       id: edge.id,
-      color: isHighlighted
-        ? { color: "#FF4136", opacity: 1 }
-        : { color: "#cccccc", opacity: 0.2 },
+      color: {
+        color: isHighlighted ? "#FF4136" : "#cccccc",
+        opacity: isHighlighted ? 1 : 0.2
+      },
       font: {
         size: isHighlighted ? 12 : 8,
         color: isHighlighted ? "#000" : "#999"
@@ -1049,13 +1042,19 @@ network.on("hoverNode", function (params) {
   });
 });
 
+// Reset everything on blur
 network.on("blurNode", function () {
   nodes.get().forEach(node => {
     nodes.update({
       id: node.id,
-      color: undefined,
+      color: {
+        background: node.originalColor,
+        border: '#333333',
+        highlight: { background: node.originalColor, border: '#111111' },
+        hover: { background: node.originalColor, border: '#000000' }
+      },
       font: {
-        size: (node.id === startId || node.id === endId) ? 14 : 1,
+        size: (node.id === strattamId || node.id === mapexId) ? 14 : 1,
         color: '#000'
       }
     });
@@ -1073,6 +1072,6 @@ network.on("blurNode", function () {
   });
 });
 
-  </script>
+</script>
 </body>
 </html>
