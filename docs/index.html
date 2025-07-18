@@ -33,7 +33,7 @@
     "label": "Mapex",
     "title": "Mapex, company",
     "group": "company",
-    "x": 900,
+    "x": 1000,
     "y": 0,
     "fixed": { x: true, y: true },
     "physics": false
@@ -907,18 +907,16 @@
       interaction: {
         hover: true
       },
-      physics: {
-    solver: "repulsion",
-    repulsion: {
-      nodeDistance: 100,     // default is 100
-      centralGravity: 0.1,
-      springLength: 80,
-      springConstant: 0.01,
-      damping: 0.09
-    },
-    stabilization: {
-      iterations: 100
+      layout: {
+    hierarchical: {
+      direction: "LR",
+      levelSeparation: 250,
+      nodeSpacing: 200
     }
+  },
+    physics: 
+    {
+    enabled: false
   }
     };
     const network = new vis.Network(container, data, options);
